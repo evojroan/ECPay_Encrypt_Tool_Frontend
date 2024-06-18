@@ -1,6 +1,4 @@
-.option,label,input[type=radio]:hover{
+label,input[type=radio]:hover{
 cursor: pointer;
 }
 
-.hashInput{
-}

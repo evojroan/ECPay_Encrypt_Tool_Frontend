@@ -1,66 +1,21 @@
 import "./App.css";
-// import { createHash } from "crypto";
-// import crypto from "crypto";
-import { useState } from "react";
+
+//import {useState} from "react";
+import useStatesHndlr from "./Eventhandlers";
 
 // 所有帳號
-const allAccounts = [
-  {
-    Num: 0,
-    name: "3002607(全方位金流 - 特店)",
-    HashKey: "pwFHCqoQZGmho4w6",
-    HashIV: "EkRm7iFT261dpevs",
-  },
-  {
-    Num: 1,
-    name: "3002599(全方位金流 - 平台商)",
-    HashKey: "spPjZn66i0OhqJsQ",
-    HashIV: "hT5OJckN45isQTTs",
-  },
-  {
-    Num: 2,
-    name: "3003008(站內付平台商)",
-    HashKey: "FCnGLNS7P3xQ2q3E",
-    HashIV: "awL5GRWRhyaybq13",
-  },
-  {
-    Num: 3,
-    name: "2000132(B2C物流)",
-    HashKey: "5294y06JbISpM5x9",
-    HashIV: "v77hoKGq4kWxNNIS",
-  },
-  {
-    Num: 4,
-    name: "2000933(C2C物流)",
-    HashKey: "XBERn1YOvpM9nfZc",
-    HashIV: "h1ONHk4P4yqbl5LK",
-  },
-  {
-    Num: 5,
-    name: "2000132(B2C與B2B電子發票 - 一般特店)",
-    HashKey: "ejCk326UnaZWKisg",
-    HashIV: "q9jcZX8Ib9LM8wYk",
-  },
-  {
-    Num: 6,
-    name: "3085340(B2C電子發票與離線發票 - 平台商)",
-    HashKey: "HwiqPsywG1hLQNuN",
-    HashIV: "YqITWD4TyKacYXpn",
-  },
-  { Num: 7, name: "自行輸入", HashKey: "", HashIV: "" },
-];
 
 //元件：輸入資料
 function Inputs({
-  
+  propAllAccounts,
   propChooseOption,
-  propChosenOption,
+  propOption,
   propChooseCMValgo,
   propChooseAct,
   propChosenAct,
   propHashInput,
   propParamsInput,
-
+  propCheckMacValueGen
 }) {
   return (
     <div>
@@ -75,11 +30,13 @@ function Inputs({
             onClick={propChooseOption}
             defaultChecked
           />
-          <label htmlFor="CheckMacValue" onClick={propChooseOption}>
+          <label
+            htmlFor="CheckMacValue"
+            onClick={propChooseOption}>
             計算 CheckMacValue
           </label>
           <div>
-            {propChosenOption == 0 ? (
+            {propOption == 0 ? (
               <>
                 加密方式：
                 <span onClick={propChooseCMValgo}>
@@ -107,7 +64,9 @@ function Inputs({
             )}
           </div>
         </div>
-        <div className="option" onClick={propChooseOption}>
+        <div
+          className="option"
+          onClick={propChooseOption}>
           <input
             onClick={propChooseOption}
             type="radio"
@@ -117,7 +76,9 @@ function Inputs({
           />
           <label htmlFor="AESEncrypt">AES 加密</label>
         </div>
-        <div className="option" onClick={propChooseOption}>
+        <div
+          className="option"
+          onClick={propChooseOption}>
           <input
             onClick={propChooseOption}
             type="radio"
@@ -131,9 +92,11 @@ function Inputs({
       <div className="InputPart2">
         <h2>2. 選擇金鑰</h2>
         <select onChange={propChooseAct}>
-          {allAccounts.map((act) => {
+          {propAllAccounts.map(act => {
             return (
-              <option key={act.Num} value={act.Num}>
+              <option
+                key={act.Num}
+                value={act.Num}>
                 {act.name}
               </option>
             );
@@ -142,13 +105,13 @@ function Inputs({
 
         {propChosenAct.Num == 7 ? (
           <div className="hashInput">
-           <span>請輸入 HashKey：</span> 
+            <span>請輸入 HashKey：</span>
             <input
               type="text"
               className="hashInput"
               id="hashKeyInput"
-               onChange={propHashInput}
-            />   
+              onChange={propHashInput}
+            />
             <br />
             <span>請輸入 HashIV：</span>
             <input
@@ -175,76 +138,58 @@ function Inputs({
           若要 AES 解密請輸入字串
         </p>
 
-        <input className="inputParams" type="text" onInput={propParamsInput} />
+        <input
+          className="inputParams"
+          type="text"
+          onInput={propParamsInput}
+        />
       </div>
-      <button>計算結果</button>
+      <button onClick={propCheckMacValueGen}>計算結果</button>
     </div>
   );
 }
 
 //元件：計算與輸出
-function Outputs({ propChosenCMValgo, propParams }) {
-  return <>OUTPUTS</>;
+function Outputs({propOutPuts}) {
+  return <div dangerouslySetInnerHTML={{__html: propOutPuts}} />;
 }
 
 //最終畫面
 function App() {
-  const [accounts, setAccounts] = useState(allAccounts);
-  const [option, setOption] = useState(0); // 所選方式，預設 0
-  const [chosenAct, setChosenAct] = useState(accounts[0]); //所選金鑰
-  const [CMValgorithm, setCMValgorithm] = useState("sha256");
-  const [inputParams, setInputParams] = useState("");
-
-  //事件處理器：選擇方式
-  function chooseOption(event) {
-    setOption(event.target.value);
-  }
-
-  //事件處理器：選擇演算法
-  function chooseCMValgo(event) {
-    setCMValgorithm(event.target.value);
-  }
-
-  //事件處理器：選擇金鑰
-  function chooseAct(event) {
-    setChosenAct(accounts[event.target.value]);
-
-  }
-
-
-
-  //事件處理器：修改 accounts[7]的自訂 HashKey、HashIV
-  function hashInput(event) {
-    const newAccounts = [...accounts];
-  if (event.target.id === "hashKeyInput") {
-    newAccounts[7].HashKey = event.target.value;
-  } else if (event.target.id === "hashIVInput") {
-    newAccounts[7].HashIV = event.target.value;
-  }
-  setAccounts(newAccounts);
-  }
-
-  //事件處理器：輸入參數
-  function paramsInput(event) {
-    setInputParams(event.target.value);
-  }
+  const {
+    allAccounts,
+    accounts,
+    option,
+    chosenAct,
+    CMValgorithm,
+    inputParams,
+    chooseOption,
+    chooseCMValgo,
+    chooseAct,
+    hashInput,
+    paramsInput,
+    CheckMacValueGen,
+    outPuts
+  } = useStatesHndlr();
 
   return (
     <div>
       <h1>綠界檢查碼、 AES 加解密產生器</h1>
+
       <Inputs
-        
+        propAllAccounts={allAccounts}
         propChooseOption={chooseOption} //事件處理器：選擇方式
-        propChosenOption={option} //所選方式
+        propOption={option} //所選方式
         propChooseCMValgo={chooseCMValgo} //事件處理器：選擇演算法
         propChooseAct={chooseAct} //事件處理器：選擇金鑰
         propChosenAct={chosenAct} //所選金鑰
-        propHashInput={hashInput}//事件處理器：修改 accounts[7]的自訂 HashKey、HashIV
+        propHashInput={hashInput} //事件處理器：修改 accounts[7]的自訂 HashKey、HashIV
         propParamsInput={paramsInput} //事件處理器：輸入參數
+        propCheckMacValueGen={CheckMacValueGen}
       />
-
       <h2>4. 計算結果</h2>
-      <Outputs propChosenCMValgo={CMValgorithm} propParams={inputParams} />
+
+      <Outputs propOutPuts={outPuts} />
     </div>
   );
 }

@@ -53,7 +53,7 @@ export default function useStatesHndlr() {
   const [chosenAct, setChosenAct] = useState(accounts[0]); //所選金鑰
   const [CMValgorithm, setCMValgorithm] = useState("sha256");
   const [inputParams, setInputParams] = useState("");
-  const [outPuts, setOutPuts] = useState("預設out");
+  const [outPuts, setOutPuts] = useState("");
 
   //Input 事件處理器：選擇方式
   function chooseOption(event) {

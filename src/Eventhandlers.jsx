@@ -85,11 +85,34 @@ export default function useStatesHndlr() {
   function paramsInput(event) {
     setInputParams(event.target.value);
   }
+  //Input 事件處理器：清除參數
+  function clearInput() {
+    setInputParams("");
+    setOutPuts("");
+  }
+
+  //Output 事件處理器：複製結果
+  function copyResult() {
+    const resultElement = document.querySelector(".toCopy");
+    if (resultElement) {
+      const textToCopy = resultElement.textContent;
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          alert("已複製結果!");
+        })
+        .catch(err => {
+          console.error("複製失敗:", err);
+        });
+    } else {
+      alert("沒有找到可複製的結果");
+    }
+  }
 
   async function CheckMacValueGen() {
     try {
       const response = await axios.post("http://localhost:3000/", {
-        option: option,
+        option: Number(option), //在 React 應用中，如果您使用 radio buttons 或 select 元素來選擇 option，這些元素的值通常會被當作字符串處理。
         inputParams: inputParams,
         CMValgorithm: CMValgorithm,
         HashKey: chosenAct.HashKey,
@@ -101,73 +124,6 @@ export default function useStatesHndlr() {
       setOutPuts("發生錯誤：" + error.message);
     }
   }
-
-  //Output 事件處理器：計算 CheckMacValue
-  async function CheckMacValueGen2(params, CMValgorithm, digest) {
-    let CMVStep0;
-    if (typeof params === "string") {
-      CMVStep0 = params;
-    } else if (typeof params === "object") {
-      CMVStep0 = Object.entries(params)
-        .map(([Key, value]) => `${Key}=${value}`)
-        .join("&");
-    }
-
-    function DotNETURLEncode(string) {
-      const list = {
-        "%2D": "-",
-        "%5F": "_",
-        "%2E": ".",
-        "%21": "!",
-        "%2A": "*",
-        "%28": "(",
-        "%29": ")",
-        "%20": "+"
-      };
-
-      Object.entries(list).forEach(([encoded, decoded]) => {
-        const regex = new RegExp(encoded, "g");
-        string = string.replace(regex, decoded);
-      });
-
-      return string;
-    }
-
-    const CMVStep1 = CMVStep0.split("&")
-      .sort((a, b) => {
-        const KeyA = a.split("=")[0];
-        const KeyB = b.split("=")[0];
-        return KeyA.localeCompare(KeyB);
-      })
-      .join("&");
-    const CMVStep2 = `HashKey=${chosenAct.HashKey}&${CMVStep1}&HashIV=${chosenAct.HashIV}`;
-    const CMVStep3 = DotNETURLEncode(encodeURIComponent(CMVStep2));
-    const CMVStep4 = CMVStep3.toLowerCase();
-    const CMVStep5 = createHash(CMValgorithm).update(CMVStep4).digest(digest);
-    const CMVStep6 = CMVStep5.toUpperCase();
-
-    return `
-    檢核碼計算順序<br/>
-  <p>(1) 將傳遞參數依照第一個英文字母，由A到Z的順序來排序(遇到第一個英名字母相同時，以第二個英名字母來比較，以此類推)，並且以&方式將所有參數串連。<br/>
-  ${CMVStep1}</p>
-
-  <p>(2) 參數最前面加上HashKey、最後面加上HashIV<br/>
-  ${CMVStep2}</p>
-
-  <p>(3) 將整串字串進行URL encode<br/>
-  ${CMVStep3}</p>
-
-  <p>(4) 轉為小寫<br/>
-  ${CMVStep4}</p>
-
-  <p>(5) 以 ${CMValgorithm} 方式產生雜凑值<br/>
-  ${CMVStep5}</p>
-
-  <p>(6) 再轉大寫產生 CheckMacValue<br/>
-  ${CMVStep6}</p>
-    `;
-  }
-
   return {
     allAccounts,
     accounts,
@@ -181,6 +137,8 @@ export default function useStatesHndlr() {
     chooseAct,
     hashInput,
     paramsInput,
+    clearInput,
+    copyResult,
     CheckMacValueGen
   };
 }

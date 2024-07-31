@@ -3,7 +3,49 @@ import "./App.css";
 //import {useState} from "react";
 import useStatesHndlr from "./Eventhandlers";
 
-// 所有帳號
+//最終畫面
+function App() {
+  const {
+    allAccounts,
+    option,
+    chosenAct,
+    chooseOption,
+    chooseCMValgo,
+    chooseAct,
+    hashInput,
+    inputParams,
+    paramsInput,
+    clearInput,
+    copyResult,
+    CheckMacValueGen,
+    outPuts
+  } = useStatesHndlr();
+
+  return (
+    <div>
+      <h1>綠界檢查碼、 AES 加解密產生器</h1>
+      <Inputs
+        propAllAccounts={allAccounts}
+        propChooseOption={chooseOption} //事件處理器：選擇方式
+        propOption={option} //所選方式
+        propChooseCMValgo={chooseCMValgo} //事件處理器：選擇演算法
+        propChooseAct={chooseAct} //事件處理器：選擇金鑰
+        propChosenAct={chosenAct} //所選金鑰
+        propHashInput={hashInput} //事件處理器：修改 accounts[7]的自訂 HashKey、HashIV
+        propInputParams={inputParams}
+        propParamsInput={paramsInput} //事件處理器：輸入參數
+        propClearInput={clearInput}
+        propCheckMacValueGen={CheckMacValueGen}
+      />
+      <h2>4. 計算結果</h2>
+
+      <Outputs
+        propOutPuts={outPuts}
+        propCopyResult={copyResult}
+      />
+    </div>
+  );
+}
 
 //元件：輸入資料
 function Inputs({
@@ -14,7 +56,9 @@ function Inputs({
   propChooseAct,
   propChosenAct,
   propHashInput,
+  propInputParams,
   propParamsInput,
+  propClearInput,
   propCheckMacValueGen
 }) {
   return (
@@ -141,56 +185,23 @@ function Inputs({
         <input
           className="inputParams"
           type="text"
+          value={propInputParams}
           onInput={propParamsInput}
         />
       </div>
       <button onClick={propCheckMacValueGen}>計算結果</button>
+      <button onClick={propClearInput}>清除</button>
     </div>
   );
 }
 
 //元件：計算與輸出
-function Outputs({propOutPuts}) {
-  return <div dangerouslySetInnerHTML={{__html: propOutPuts}} />;
-}
-
-//最終畫面
-function App() {
-  const {
-    allAccounts,
-    accounts,
-    option,
-    chosenAct,
-    CMValgorithm,
-    inputParams,
-    chooseOption,
-    chooseCMValgo,
-    chooseAct,
-    hashInput,
-    paramsInput,
-    CheckMacValueGen,
-    outPuts
-  } = useStatesHndlr();
-
+function Outputs({propOutPuts, propCopyResult}) {
   return (
-    <div>
-      <h1>綠界檢查碼、 AES 加解密產生器</h1>
-
-      <Inputs
-        propAllAccounts={allAccounts}
-        propChooseOption={chooseOption} //事件處理器：選擇方式
-        propOption={option} //所選方式
-        propChooseCMValgo={chooseCMValgo} //事件處理器：選擇演算法
-        propChooseAct={chooseAct} //事件處理器：選擇金鑰
-        propChosenAct={chosenAct} //所選金鑰
-        propHashInput={hashInput} //事件處理器：修改 accounts[7]的自訂 HashKey、HashIV
-        propParamsInput={paramsInput} //事件處理器：輸入參數
-        propCheckMacValueGen={CheckMacValueGen}
-      />
-      <h2>4. 計算結果</h2>
-
-      <Outputs propOutPuts={outPuts} />
-    </div>
+    <>
+      <div dangerouslySetInnerHTML={{__html: propOutPuts}} />
+      <button onClick={propCopyResult}>複製結果</button>
+    </>
   );
 }
 

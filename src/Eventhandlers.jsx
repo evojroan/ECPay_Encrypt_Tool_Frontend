@@ -111,13 +111,16 @@ export default function useStatesHndlr() {
 
   async function CheckMacValueGen() {
     try {
-      const response = await axios.post("http://localhost:3000/", {
-        option: Number(option), //在 React 應用中，如果您使用 radio buttons 或 select 元素來選擇 option，這些元素的值通常會被當作字符串處理。
-        inputParams: inputParams,
-        CMValgorithm: CMValgorithm,
-        HashKey: chosenAct.HashKey,
-        HashIV: chosenAct.HashIV
-      });
+      const response = await axios.post(
+        "https://ecpay-encrypt-tool-backend.vercel.app/",
+        {
+          option: Number(option), //在 React 應用中，如果您使用 radio buttons 或 select 元素來選擇 option，這些元素的值通常會被當作字符串處理。
+          inputParams: inputParams,
+          CMValgorithm: CMValgorithm,
+          HashKey: chosenAct.HashKey,
+          HashIV: chosenAct.HashIV
+        }
+      );
       setOutPuts(response.data);
     } catch (error) {
       console.error(error);
